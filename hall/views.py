@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from .models import Hall
 from cinema.models import Cinema
@@ -42,12 +43,10 @@ class SeatReservationAPIView(APIView):
             'message': message
         })
     
-class HallCinemaAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        cinema = get_object_or_404(Cinema, id=kwargs['cinema_id'])
-        halls = Hall.objects.filter(cinema = cinema)
-        return Response({
-            'halls': HallSerializer(halls, many=True).data
-        })
+class HallCinemaAPIView(ListAPIView):
+    serializer_class = HallSerializer
 
+    def get_queryset(self):
+        cinema = get_object_or_404(Cinema, id=self.kwargs['cinema_id'])
+        return Hall.objects.filter(cinema = cinema)
 
