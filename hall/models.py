@@ -18,9 +18,3 @@ class Hall(models.Model):
     def __str__(self):
         return self.name
     
-    # def reserved_seat(self, seat_number, row):
-    #     seats = self.row.get(row, [])
-    #     for seat in seats:
-    #         if seat["number"] == seat_number:
-    #             return "Reserved" if seat.get("reserved", False) else "No reserved"
-    #     return "Місце не знайдено"

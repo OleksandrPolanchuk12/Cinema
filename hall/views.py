@@ -5,7 +5,7 @@ from .models import Hall
 from cinema.models import Cinema
 from .serializers import HallSerializer
 
-class SeatReservationView(APIView):
+class SeatReservationAPIView(APIView):
     def get(self, request, *args, **kwargs):
         hall_id = kwargs['hall_id']
         hall = get_object_or_404(Hall, id=hall_id)
@@ -42,7 +42,7 @@ class SeatReservationView(APIView):
             'message': message
         })
     
-class HallCinemaView(APIView):
+class HallCinemaAPIView(APIView):
     def get(self, request, *args, **kwargs):
         cinema = get_object_or_404(Cinema, id=kwargs['cinema_id'])
         halls = Hall.objects.filter(cinema = cinema)
