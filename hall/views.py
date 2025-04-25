@@ -54,5 +54,5 @@ class SingleHallAPIView(RetrieveAPIView):
     serializer_class = HallSerializer
 
     def get_object(self):
-        return get_object_or_404(Hall, id=self.kwargs['hall_id'])
+        return get_object_or_404(Hall, id=self.kwargs['hall_id'], cinema = self.kwargs['cinema_id'])
 
