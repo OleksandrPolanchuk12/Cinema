@@ -5,7 +5,7 @@ from hall.models import Hall
 class Show(models.Model):
     hall = models.ForeignKey(Hall, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE) 
-    showtimes = models.DateTimeField(default=None)
+    showtime = models.DateTimeField(default=None)
     prices= models.JSONField(default=dict)
     
     def __str__(self):
