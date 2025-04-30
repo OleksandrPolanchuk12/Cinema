@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='Show',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('showtimes', models.JSONField(default=dict)),
+                ('showtimes', models.DateTimeField(default=None)),
                 ('prices', models.JSONField(default=dict)),
                 ('hall', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='hall.hall')),
                 ('movie', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='movie.movie')),
