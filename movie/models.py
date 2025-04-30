@@ -10,8 +10,13 @@ class Movie(models.Model):
     genres = models.CharField(max_length=255)
     release_date = models.DateField()
     duration = models.DurationField()
-    poster = models.ImageField(upload_to='media/posters/', name=f'Poster {title}')
+    poster = models.ImageField(upload_to=f'media/posters/')
 
+    def save(self, *args, **kwargs):
+        if self.poster:
+            self.poster.name = f'{self.title}_{self.release_date}.jpg'
+        super().save(*args, **kwargs)
+        
     def __str__(self):
         return self.title
     
