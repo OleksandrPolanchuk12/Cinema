@@ -28,18 +28,20 @@ class CurrentDayShowAPIView(APIView):
         cinema = get_object_or_404(Cinema, id=cinema_id)
         halls = get_list_or_404(Hall, cinema=cinema)
         shows = []
-        now = timezone.now()
+        now = timezone.localtime()
 
         for hall in halls:
             if show_end:
-                showtimes = get_list_or_404(Show, hall=hall, showtime__range=(show_start,show_end))
+                showtimes = Show.objects.filter( hall=hall, showtime__range=(show_start,show_end),
+                                            end_show__gt=show_end)
             else:
                 if show_start.date() == now.date():
-                    showtimes = get_list_or_404(Show,hall=hall, showtime__date=show_start.date(),
-                                                showtime__time__gt=now.time())
+                    showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),
+                                                showtime__gt=now, end_show__gt=show_start)
                 else:
-                    showtimes = get_list_or_404(Show,hall=hall, showtime__date=show_start.date())
-            shows.append(ShowSerializer(showtimes, many=True).data)
+                    showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),
+                                                end_show__gt=show_start)
+            shows.extend(ShowSerializer(showtimes, many=True).data)
         if not shows:
             return Response({'message':'Shows is ended'}, status=status.HTTP_204_NO_CONTENT)
         return Response({'shows': shows}, status=status.HTTP_200_OK)
