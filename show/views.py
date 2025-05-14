@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from .serializers import ShowSerializer
 from django.utils import timezone
@@ -47,3 +48,7 @@ class CurrentDayShowAPIView(APIView):
         if not shows:
             return Response({'message':'Shows is ended'}, status=status.HTTP_204_NO_CONTENT)
         return Response({'shows': shows}, status=status.HTTP_200_OK)
+
+class ShowDetailAPIView(RetrieveAPIView):
+    serializer_class = ShowSerializer
+    queryset = Show.objects.all()
