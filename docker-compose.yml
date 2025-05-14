@@ -20,12 +20,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      - DEBUG=True
-      - DB_NAME=cinemas_db
-      - DB_USER=root
-      - DB_PASSWORD=2025root2025
-      - DB_HOST=db
-      - DB_PORT=5432
+    env_file:
+      - .env
 volumes:
   pg_data:
