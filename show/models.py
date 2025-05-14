@@ -7,8 +7,8 @@ class Show(models.Model):
     hall = models.ForeignKey(Hall, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE) 
     showtime = models.DateTimeField(default=None)
-    start_show = models.DateField(null=True,blank=True)
-    end_show = models.DateField(null=True,blank=True)
+    start_show = models.DateField(default=None)
+    end_show = models.DateField(default=None)
     prices= models.JSONField(default=dict)
     
     def __str__(self):

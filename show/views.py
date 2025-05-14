@@ -8,6 +8,7 @@ from cinema.models import Cinema
 from .models import Show
 from rest_framework import  status
 from datetime import datetime
+from django.db.models import F
 
 class CurrentDayShowAPIView(APIView):
     def post(self, request, cinema_id):
@@ -33,14 +34,15 @@ class CurrentDayShowAPIView(APIView):
         for hall in halls:
             if show_end:
                 showtimes = Show.objects.filter( hall=hall, showtime__range=(show_start,show_end),
-                                            end_show__gt=show_end)
+                                                showtime__date__gte=F('start_show'), showtime__date__lte=F('end_show'))
             else:
                 if show_start.date() == now.date():
                     showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),
-                                                showtime__gt=now, end_show__gt=show_start)
+                                                showtime__gt=now, showtime__date__gte=F('start_show'),
+                                                showtime__date__lte=F('end_show'))
                 else:
                     showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),
-                                                end_show__gt=show_start)
+                                                showtime__date__gte=F('start_show'), showtime__date__lte=F('end_show'))
             shows.extend(ShowSerializer(showtimes, many=True).data)
         if not shows:
             return Response({'message':'Shows is ended'}, status=status.HTTP_204_NO_CONTENT)
