@@ -16,14 +16,12 @@ class CurrentDayShowAPIView(APIView):
         show_start_data = request.data.get('show_start', "")
         show_end_data = request.data.get('show_end', "")
         try:
-            if show_start_data:
-                show_start = datetime.fromisoformat(show_start_data)
-            else:
-                return Response({'message':'Missing show_start parameter'}, status=status.HTTP_400_BAD_REQUEST)
+            show_end = None
+            if not show_start_data:
+                return Response({'message': 'Missing show_start parameter'}, status=status.HTTP_400_BAD_REQUEST)
+            show_start = datetime.fromisoformat(show_start_data)
             if show_end_data:
                 show_end = datetime.fromisoformat(show_end_data)
-            else:
-                show_end = None
         except ValueError:
             return Response({'message':'Invalid datetime format'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -33,18 +31,18 @@ class CurrentDayShowAPIView(APIView):
         now = timezone.localtime()
 
         for hall in halls:
+            showtimes = None
             if show_end:
                 showtimes = Show.objects.filter( hall=hall, showtime__range=(show_start,show_end),
                                                 showtime__date__gte=F('start_show'), showtime__date__lte=F('end_show'))
-            else:
-                if show_start.date() == now.date():
-                    showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),
-                                                showtime__gt=now, showtime__date__gte=F('start_show'),
-                                                showtime__date__lte=F('end_show'))
-                else:
-                    showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),
+            if show_start.date() == now.date() and show_end is None:
+                showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),showtime__gt=now,
+                                                showtime__date__gte=F('start_show'),showtime__date__lte=F('end_show'))
+            if show_start.date() != now.date and show_end is None:
+                showtimes = Show.objects.filter(hall=hall, showtime__date=show_start.date(),
                                                 showtime__date__gte=F('start_show'), showtime__date__lte=F('end_show'))
-            shows.extend(ShowSerializer(showtimes, many=True).data)
+            if showtimes:
+                shows.extend(ShowSerializer(showtimes, many=True).data)
         if not shows:
             return Response({'message':'Shows is ended'}, status=status.HTTP_204_NO_CONTENT)
         return Response({'shows': shows}, status=status.HTTP_200_OK)
