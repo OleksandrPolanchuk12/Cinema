@@ -17,6 +17,7 @@ from .serializers import ShowSerializer
 class CurrentDayShowAPIView(APIView):
     def post(self, request, cinema_id):
         show_start_data = request.data.get('show_start', "")
+        show_end_data = request.data.get('show_end', "")
 
         if not show_start_data:
             return Response({'message': 'Missing show_start parameter'}, status=status.HTTP_400_BAD_REQUEST)
@@ -26,7 +27,7 @@ class CurrentDayShowAPIView(APIView):
             return Response({'message': 'Invalid datetime format'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            show_end = datetime.fromisoformat(request.data.get('show_end', "") or None)
+            show_end = show_end_data and datetime.fromisoformat(show_end_data)
         except ValueError:
             return Response({'message': 'Invalid datetime format'}, status=status.HTTP_400_BAD_REQUEST)
 
