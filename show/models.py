@@ -5,12 +5,17 @@ from django.utils import timezone
 
 class Show(models.Model):
     hall = models.ForeignKey(Hall, on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE) 
-    showtime = models.DateTimeField(default=None)
-    start_show = models.DateField(default=None)
-    end_show = models.DateField(default=None)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    start_show = models.DateField()
+    end_show = models.DateField()
     prices= models.JSONField(default=dict)
     
     def __str__(self):
         return f"{self.movie.title} - {self.hall.name}"
-    
+
+class ShowUnit(models.Model):
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    showtime = models.DateTimeField()
+
+    def __str__(self):
+        return  f"{self.show} - {self.showtime}"
