@@ -1,7 +1,9 @@
-from django.db import models
-from show.models import Show, ShowUnit
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db import models
+
+from show.models import ShowUnit
+
 
 class Ticket(models.Model):
     show_unit = models.ForeignKey(ShowUnit, on_delete=models.CASCADE)

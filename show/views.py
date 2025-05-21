@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.db.models import F
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.utils import timezone
 from rest_framework import status
@@ -10,8 +9,8 @@ from rest_framework.views import APIView
 
 from cinema.models import Cinema
 from hall.models import Hall
-from .models import Show
-from .serializers import ShowSerializer
+from .models import Show, ShowUnit
+from .serializers import ShowUnitSerializer, ShowSerializer
 
 
 class CurrentDayShowAPIView(APIView):
@@ -38,17 +37,19 @@ class CurrentDayShowAPIView(APIView):
         shows = []
 
         for hall in halls:
-            showtimes = Show.objects.filter(hall=hall, showtime__date__gte=F('start_show'),
-                                            showtime__date__lte=F('end_show'))
-            if show_end:
-                showtimes = showtimes.filter(showtime__range=(show_start, show_end), showtime__gt=now)
-            if not show_end and show_start.date() == now.date():
-                showtimes = showtimes.filter(showtime__date=show_start.date(), showtime__gt=now)
-            if not show_end and show_start.date() != now.date():
-                showtimes = showtimes.filter(showtime__date=show_start.date())
+            show = Show.objects.filter(hall=hall)
+            for show_obj in show:
+                show_unit = ShowUnit.objects.filter(show=show_obj, showtime__gte=show_obj.start_show,
+                                                    showtime__lte=show_obj.end_show)
+                if show_end:
+                    showtimes = show_unit.filter(showtime__range=(show_start, show_end), showtime__gt=now)
+                if not show_end and show_start.date() == now.date():
+                    showtimes = show_unit.filter(showtime__date=show_start.date(), showtime__gt=now)
+                if not show_end and show_start.date() != now.date():
+                    showtimes = show_unit.filter(showtime__date=show_start.date())
 
-            if showtimes:
-                shows.extend(ShowSerializer(showtimes, many=True).data)
+                if showtimes:
+                    shows.extend(ShowUnitSerializer(showtimes, many=True).data)
 
         if not shows:
             return Response({'message': 'Shows is ended'}, status=status.HTTP_204_NO_CONTENT)
