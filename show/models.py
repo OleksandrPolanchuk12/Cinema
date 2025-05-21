@@ -18,4 +18,4 @@ class ShowUnit(models.Model):
     showtime = models.DateTimeField()
 
     def __str__(self):
-        return  f"{self.show} - {self.showtime}"
+        return  f"{self.show.movie.title} - {self.showtime} - {self.show.hall.name}"
