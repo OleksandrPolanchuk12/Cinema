@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+
+from django.conf.global_settings import AUTHENTICATION_BACKENDS
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -47,7 +49,8 @@ INSTALLED_APPS = [
     'hall',
     'movie',
     'show',
-    'ticket'
+    'ticket',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +126,10 @@ REST_FRAMEWORK = {
     'rest_framework.permissions.IsAuthenticated'
     ]
 }
+
+# Authentication
+
+AUTH_USER_MODEL = 'user.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
