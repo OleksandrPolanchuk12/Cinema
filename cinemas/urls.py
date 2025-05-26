@@ -23,5 +23,6 @@ urlpatterns = [
     path('', include('cinema.urls')),
     path('', include('movie.urls')),
     path('', include('show.urls')),
-    path('', include('ticket.urls'))
+    path('', include('ticket.urls')),
+    path('', include('user.urls')),
 ]
