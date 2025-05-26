@@ -7,7 +7,7 @@ def send_email(email, code):
     send_mail(
         'Ваш код підтвердження для відновлення паролю',
         f'Ваш код підтвердження: {code}',
-        settings.EMAIL_HSOT_USER,
+        settings.EMAIL_HOST_USER,
         [email],
         fail_silently=False
     )
