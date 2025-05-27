@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 
-
 from .models import User
 from .serializers import UserSerializer
 from .tasks import send_email
@@ -32,8 +31,6 @@ class RegisterUserAPIView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
-        user.set_password(password)
-        user.save()
 
         token = Token.objects.create(user=user)
         response = Response({'message': 'Registered successful'}, status=status.HTTP_201_CREATED)

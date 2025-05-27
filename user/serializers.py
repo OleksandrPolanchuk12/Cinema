@@ -18,3 +18,10 @@ class UserSerializer(ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("User with this email already exists")
         return value
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(validated_data.password)
+        user.save()
+        return user
