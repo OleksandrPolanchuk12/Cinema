@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from .serializers import SeatReservationSerializer
 
 
 class SeatReservationAPIView(APIView):
+    @swagger_auto_schema(request_body=SeatReservationSerializer)
     def post(self, request, *args, **kwargs):
         show_id = kwargs['show_id']
         show_unit = get_object_or_404(ShowUnit, id=show_id)

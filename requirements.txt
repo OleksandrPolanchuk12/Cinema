@@ -9,3 +9,4 @@ sqlparse==0.5.3
 typing_extensions==4.13.2
 celery==5.5.2
 redis==6.1.0
+drf-yasg==1.21.10

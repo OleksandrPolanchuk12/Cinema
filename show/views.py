@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
@@ -10,25 +11,16 @@ from rest_framework.views import APIView
 from cinema.models import Cinema
 from hall.models import Hall
 from .models import Show, ShowUnit
-from .serializers import ShowUnitSerializer, ShowSerializer
+from .serializers import ShowUnitSerializer, ShowSerializer, CurrentShowDaySerializer
 
 
 class CurrentDayShowAPIView(APIView):
+    @swagger_auto_schema(request_body=CurrentShowDaySerializer)
     def post(self, request, cinema_id):
-        show_start_data = request.data.get('show_start', "")
-        show_end_data = request.data.get('show_end', "")
-
-        if not show_start_data:
-            return Response({'message': 'Missing show_start parameter'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            show_start = datetime.fromisoformat(show_start_data)
-        except ValueError:
-            return Response({'message': 'Invalid datetime format'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            show_end = show_end_data and datetime.fromisoformat(show_end_data)
-        except ValueError:
-            return Response({'message': 'Invalid datetime format'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = CurrentShowDaySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        show_end = serializer.validated_data['show_end']
+        show_start = serializer.validated_data['show_start']
 
         cinema = get_object_or_404(Cinema, id=cinema_id)
         halls = get_list_or_404(Hall, cinema=cinema)

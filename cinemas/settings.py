@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
     'cinema',
     'hall',
     'movie',
@@ -154,6 +155,24 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
+# Swagger settings
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Format: Token <your token>',
+        }
+    }
+}
+
+LOGIN_URL = '/login-user/'
+
+LOGOUT_URL = '/logout-user/'
+
+USE_SESSION_AUTH = False
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 

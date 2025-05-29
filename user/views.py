@@ -1,16 +1,17 @@
 import random
 
+from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
-from django.shortcuts import get_object_or_404
 
 from .models import User
-from .serializers import UserSerializer
+from .serializers import (UserSerializer, ForgotPasswordSerializer, ConfirmCodeAndResetPasswordSerializer,
+                          LoginSerializer)
 from .tasks import send_email
 
 
@@ -21,18 +22,12 @@ class RegisterUserAPIView(CreateAPIView):
     authentication_classes = []
 
     def create(self, request, *args, **kwargs):
-        password = request.data.get('password')
-        confirm_password = request.data.get('confirm_password')
-
-        if password != confirm_password:
-            return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
-
         token = Token.objects.create(user=user)
+
         response = Response({'message': 'Registered successful'}, status=status.HTTP_201_CREATED)
         response['Authorization'] = f'Token {token.key}'
         return response
@@ -42,18 +37,11 @@ class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-        if not email or not password:
-            return Response({'message': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = authenticate(request, email=email, password=password)
-
-        if not user:
-            return Response({'message': 'Invalid email pr password'}, status=status.HTTP_400_BAD_REQUEST)
-
-        token = Token.objects.create(user=user)
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        token = Token.objects.create(user=serializer.validated_data['user'])
         token.save()
 
         response = Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
@@ -74,10 +62,11 @@ class ForgotPasswordAPIView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    @swagger_auto_schema(request_body=ForgotPasswordSerializer)
     def post(self, request):
-        email = request.data.get('email')
-        if not User.objects.filter(email=email).exists():
-            return Response({'message': f'Email {email} does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ForgotPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
         code = random.randint(100000, 999999)
         send_email.delay(email, code)
         request.session["code"] = str(code)
@@ -88,31 +77,19 @@ class ConfirmCodeAndResetPasswordAPIView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    @swagger_auto_schema(request_body=ConfirmCodeAndResetPasswordSerializer)
     def post(self, request):
-        code = request.data.get('code')
-        email = request.data.get('email')
-        new_password = request.data.get('new_password')
-        confirm_new_password = request.data.get('confirm_new_password')
+        serializer = ConfirmCodeAndResetPasswordSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
-        if code and not (email and new_password and confirm_new_password):
-            correct_code = request.session.get("code")
-            if str(code) != correct_code:
-                return Response({'message': 'Wrong code'}, status=status.HTTP_400_BAD_REQUEST)
+        if not (data['email'] and data['new_password'] and data['confirm_new_password']):
             del request.session["code"]
             request.session["code_checked"] = True
             return Response({'message': 'Code confirmed'}, status=status.HTTP_200_OK)
 
-        if not (email and new_password and confirm_new_password):
-            return Response({'message': 'Missing fields'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not request.session.get("code_checked"):
-            return Response({'message': 'Code not confirmed'}, status=status.HTTP_403_FORBIDDEN)
-
-        if new_password != confirm_new_password:
-            return Response({'message': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = get_object_or_404(User, email=email)
-        user.set_password(new_password)
+        user = get_object_or_404(User, email=data['email'])
+        user.set_password(data['new_password'])
         user.save()
 
         del request.session["code_checked"]
