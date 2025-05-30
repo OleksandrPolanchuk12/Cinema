@@ -52,38 +52,39 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
 
 class ConfirmCodeAndResetPasswordSerializer(serializers.Serializer):
-    code = serializers.CharField(allow_blank=True, allow_null=True)
-    email = serializers.EmailField(allow_blank=True, allow_null=True)
-    new_password = serializers.CharField(allow_blank=True, allow_null=True)
-    confirm_new_password = serializers.CharField(allow_blank=True, allow_null=True)
+    code = serializers.CharField(allow_blank=True)
+    email = serializers.EmailField(allow_blank=True)
+    new_password = serializers.CharField(allow_blank=True, min_length=4)
+    confirm_new_password = serializers.CharField(allow_blank=True, min_length=4)
 
     def validate(self, data):
         request = self.context.get('request')
+        path = request.path
         code = data.get('code')
         email = data.get('email')
         new_password = data.get('new_password')
         confirm_new_password = data.get('confirm_new_password')
 
-        if code:
+        if path.endswith('confirm-code/'):
             correct_code = request.session.get("code")
             if not correct_code:
                 raise serializers.ValidationError({'code': 'No code found or expired in session'})
             if str(code) != str(correct_code):
                 raise serializers.ValidationError({'code': 'Wrong code'})
-
-        if not (email and new_password and confirm_new_password):
             return data
 
-        if not request.session.get("code_checked"):
-            raise serializers.ValidationError({'message': 'Code not confirmed'})
+        if path.endswith('reset-password/'):
+            if not request.session.get("code_checked"):
+                raise serializers.ValidationError({'message': 'Code not confirmed'})
 
-        if new_password != confirm_new_password:
-            raise serializers.ValidationError({'message': 'Passwords do not match'})
+            if new_password != confirm_new_password:
+                raise serializers.ValidationError({'message': 'Passwords do not match'})
 
-        if not User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(f'Email {email} does not exist')
+            if not User.objects.filter(email=email).exists():
+                raise serializers.ValidationError(f'Email {email} does not exist')
+            return data
 
-        return data
+        raise serializers.ValidationError('Unknown endpoint')
 
 
 class LoginSerializer(serializers.Serializer):

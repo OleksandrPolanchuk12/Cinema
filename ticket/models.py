@@ -21,7 +21,7 @@ class Ticket(models.Model):
         if self.row not in seats_hall:
             raise ValidationError(f"Row {self.row} does not exists")
 
-        seats = any(seat['number'] == self.seat_number for seat in seats_hall[self.row])
+        seats = any(seat['number'] == str(self.seat_number) for seat in seats_hall[self.row])
         if not seats:
             raise ValidationError(f'Seat {self.seat_number} does not exists')
         super().save(*args, **kwargs)

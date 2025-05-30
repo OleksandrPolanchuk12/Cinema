@@ -82,8 +82,9 @@ class ConfirmCodeAndResetPasswordAPIView(APIView):
         serializer = ConfirmCodeAndResetPasswordSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
+        path = request.path
 
-        if not (data['email'] and data['new_password'] and data['confirm_new_password']):
+        if path.endswith('confirm-code/'):
             del request.session["code"]
             request.session["code_checked"] = True
             return Response({'message': 'Code confirmed'}, status=status.HTTP_200_OK)

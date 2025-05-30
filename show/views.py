@@ -19,8 +19,8 @@ class CurrentDayShowAPIView(APIView):
     def post(self, request, cinema_id):
         serializer = CurrentShowDaySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        show_end = serializer.validated_data['show_end']
-        show_start = serializer.validated_data['show_start']
+        show_end = serializer.validated_data['show_end_data']
+        show_start = serializer.validated_data['show_start_data']
 
         cinema = get_object_or_404(Cinema, id=cinema_id)
         halls = get_list_or_404(Hall, cinema=cinema)
