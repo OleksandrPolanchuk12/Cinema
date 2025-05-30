@@ -3,10 +3,12 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 
+from user.models import User
 from show.models import ShowUnit
 from .models import Ticket
-from .serializers import SeatReservationSerializer
+from .serializers import SeatReservationSerializer, TicketSerializer
 
 
 class SeatReservationAPIView(APIView):
@@ -26,3 +28,11 @@ class SeatReservationAPIView(APIView):
             'message': f'Seat {seat_number} in row {row} successfully reserved'},
             status=status.HTTP_201_CREATED
         )
+
+class TicketListAPIView(ListAPIView):
+    serializer_class = TicketSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        return Ticket.objects.filter(user=user)

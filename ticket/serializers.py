@@ -20,3 +20,8 @@ class SeatReservationSerializer(Serializer):
 
         return  data
 
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ['show_unit', 'row', 'seat_number']
