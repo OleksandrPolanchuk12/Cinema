@@ -16,8 +16,8 @@ class SeatReservationAPIView(APIView):
     def post(self, request, *args, **kwargs):
         show_id = kwargs['show_id']
         show_unit = get_object_or_404(ShowUnit, id=show_id)
-        serializer_data = SeatReservationSerializer(data=request.data, context={'show_unit': show_unit})
-
+        serializer_data = SeatReservationSerializer(data=request.data, context={'show_unit': show_unit,
+                                                                                'cinema_id': kwargs['cinema_id']})
         if not serializer_data.is_valid():
             return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
         row = serializer_data.validated_data['row']
@@ -28,6 +28,7 @@ class SeatReservationAPIView(APIView):
             'message': f'Seat {seat_number} in row {row} successfully reserved'},
             status=status.HTTP_201_CREATED
         )
+
 
 class TicketListAPIView(ListAPIView):
     serializer_class = TicketSerializer
