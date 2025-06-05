@@ -1,7 +1,13 @@
+import os
+
+from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from django.db import models
-import os
+
+from user.models import User
+from django.core.exceptions import ValidationError
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -10,16 +16,27 @@ class Movie(models.Model):
     genres = models.CharField(max_length=255)
     release_date = models.DateField()
     duration = models.DurationField()
+    rating = models.IntegerField(default=0)
     poster = models.ImageField(upload_to=f'media/posters/')
 
     def save(self, *args, **kwargs):
         if self.poster:
             self.poster.name = f'{self.title}_{self.release_date}.jpg'
         super().save(*args, **kwargs)
-        
+
     def __str__(self):
         return self.title
-    
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    state = models.BooleanField()
+
+    def __str__(self):
+        return f'{self.user} - {self.movie} - {self.state}'
+
+
 @receiver(post_delete, sender=Movie)
 def delete_poster(sender, instance, **kwargs):
     if instance.poster:

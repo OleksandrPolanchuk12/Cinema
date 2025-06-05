@@ -168,9 +168,9 @@ SWAGGER_SETTINGS = {
     }
 }
 
-LOGIN_URL = '/login-user/'
+LOGIN_URL = '/user/login/'
 
-LOGOUT_URL = '/logout-user/'
+LOGOUT_URL = '/user/logout/'
 
 USE_SESSION_AUTH = False
 # Internationalization
