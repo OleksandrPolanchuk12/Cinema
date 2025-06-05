@@ -4,4 +4,4 @@ from .models import Cinema
 class CinemaSerializer(ModelSerializer):
     class Meta:
         model = Cinema
-        fields = ['name', 'address', 'phone', 'email', 'city']
+        fields = ['id', 'name', 'address', 'phone', 'email', 'city']

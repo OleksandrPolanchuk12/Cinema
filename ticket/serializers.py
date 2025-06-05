@@ -50,4 +50,4 @@ class FreeSeatsSerializer(Serializer):
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
-        fields = ['show_unit', 'row', 'seat_number']
+        fields = ['id', 'show_unit', 'row', 'seat_number']

@@ -14,7 +14,7 @@ class ShowSerializer(ModelSerializer):
 class ShowUnitSerializer(ModelSerializer):
     class Meta:
         model = ShowUnit
-        fields = ['show', 'showtime']
+        fields = ['id' ,'show', 'showtime']
 
 
 class CurrentShowDaySerializer(serializers.Serializer):

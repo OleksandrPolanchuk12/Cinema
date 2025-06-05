@@ -3,10 +3,10 @@ from .views import (RegisterUserAPIView, LoginAPIView, LogoutAPIVIew, ForgotPass
                     ConfirmCodeAndResetPasswordAPIView)
 
 urlpatterns = [
-    path('register-user/', RegisterUserAPIView.as_view()),
-    path('login-user/', LoginAPIView.as_view()),
-    path('logout-user/', LogoutAPIVIew.as_view()),
-    path('forgot-password/', ForgotPasswordAPIView.as_view()),
-    path('confirm-code/', ConfirmCodeAndResetPasswordAPIView.as_view()),
-    path('reset-password/', ConfirmCodeAndResetPasswordAPIView.as_view())
+    path('user/register/', RegisterUserAPIView.as_view()),
+    path('user/login/', LoginAPIView.as_view()),
+    path('user/logout/', LogoutAPIVIew.as_view()),
+    path('forgot-password/sending-code/', ForgotPasswordAPIView.as_view()),
+    path('forgot-password/confirm-code/', ConfirmCodeAndResetPasswordAPIView.as_view()),
+    path('forgot-password/reset-password/', ConfirmCodeAndResetPasswordAPIView.as_view())
 ]

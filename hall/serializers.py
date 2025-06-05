@@ -6,4 +6,4 @@ from .models import Hall
 class HallSerializer(ModelSerializer):
     class Meta:
         model = Hall
-        fields = ['name', 'capacity', 'row', 'seat', 'cinema']
+        fields = ['id', 'name', 'capacity', 'row', 'seat', 'cinema']
