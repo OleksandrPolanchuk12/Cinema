@@ -4,10 +4,17 @@ from .models import Movie, Like
 from django.shortcuts import get_object_or_404
 
 class MovieSerializer(ModelSerializer):
+    rating_user = serializers.SerializerMethodField()
     class Meta:
         model = Movie
         fields = '__all__'
 
+    def get_rating_user(self, obj):
+        request = self.context.get('request')
+        if request:
+            like = Like.objects.filter(user=request.user, movie=obj).first()
+            return like.state if like else None
+        return None
 
 class LikeSerializer(Serializer):
     rating = serializers.BooleanField()
