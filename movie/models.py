@@ -42,3 +42,12 @@ def delete_poster(sender, instance, **kwargs):
     if instance.poster:
         if os.path.isfile(instance.poster.path):
             os.remove(instance.poster.path)
+
+
+@receiver(post_delete, sender=Like)
+def delete_like(sender, instance, **kwargs):
+    if instance:
+        state = instance.state
+        instance.movie.rating += -1 if state else 1
+        instance.movie.save()
+
